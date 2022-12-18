@@ -36,6 +36,7 @@ acceleration(state){
 
 set_gap(last_rider){
     this.gap = -(last_rider + this.x[0])-defaults.MIN_DRAFT_DISTANCE;
+    console.log(this.gap)
 }
 drag(){
     let rho = 1.225;
@@ -44,8 +45,9 @@ drag(){
         apparent_cda = this.cda;
     }
     else{
-        apparent_cda = this.cda - Math.min(0.15, 0.15 / (-this.gap+0.2));
+        apparent_cda = this.cda - Math.min(0.15, 0.15 / (this.gap+1.5));
     }
+
     return 0.5 * rho * (this.x[1] + defaults.GROUP_SPEED) ** 2 * apparent_cda;
 }
 neutral_drag() {
@@ -54,7 +56,7 @@ neutral_drag() {
     if (this.gap < 0){
         apparent_cda = this.cda;
     } else{
-        apparent_cda = this.cda - Math.min(0.1, 0.1 / (-this.gap+1));
+        apparent_cda = this.cda - Math.min(0.15, 0.15 / (this.gap+1.5));
     }
     return 0.5 * rho * defaults.GROUP_SPEED ** 2 * this.cda
 }
@@ -85,8 +87,7 @@ set_y(npcs_list){
     }
     let wheel_rear = defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
     let wheel_front = -defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
-    console.log('Front gap ' + wheel_front + ' rear gap' + wheel_rear)
-    this.y = 0.5*(1- funcs.sigmoid(10*wheel_front) -funcs.sigmoid(-10*wheel_rear))/defaults.M2PX + defaults.width/2;
+    this.y = -0.5*(1- funcs.sigmoid(10*wheel_front) -funcs.sigmoid(-25*wheel_rear-1.4))/defaults.M2PX + defaults.width/2;
 }
 
 advance_pos(){
