@@ -27,3 +27,21 @@ export function multiA(a,b){
     return c;
 }
 
+export function writeText(context, content,x,y,sz, colorVal) {
+    context.font = "italic bold " + sz + "px Tahoma";
+    context.fillStyle = 'white';
+    context.textAlign = 'right;'
+    context.fillStyle = rainbow(colorVal)
+    context.fillText(content, x, y);
+  }
+
+export function pwrToFontsize(pwr){
+    let base_size = 40;
+    base_size = base_size + Math.max(pwr/40,0);
+    return String(base_size)
+}
+
+export function rainbow(n) {
+    let str = 'hsl('+ 360*n/1200 +',100%,50%)';
+    return str
+}

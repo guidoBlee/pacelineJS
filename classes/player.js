@@ -64,7 +64,7 @@ neutral_watts(){
     return this.neutral_drag() * defaults.GROUP_SPEED
 }
 drag_watts(){
-    return this.drag() * (defaults.GROUP_SPEED + this.x[1])
+    return this.drag() * (defaults.GROUP_SPEED - this.x[1])
 }
 
 
@@ -85,9 +85,10 @@ set_y(npcs_list){
     for (let i = 0; i < npcs_list.length; i++){
         npc_dx[i] = npcs_list[i].x[0] + this.x[0]
     }
-    let wheel_rear = defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
-    let wheel_front = -defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
-    this.y = -0.5*(1- funcs.sigmoid(10*wheel_front) -funcs.sigmoid(-25*wheel_rear-1.4))/defaults.M2PX + defaults.width/2;
+    let wheel_rear = -0.2 + defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
+    console.log(wheel_rear)
+    let wheel_front = 0.15 -defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
+    this.y = 25 + -0.5*(1- funcs.sigmoid(25*wheel_front) -funcs.sigmoid(-25*wheel_rear))/defaults.M2PX + defaults.width/2;
 }
 
 advance_pos(){

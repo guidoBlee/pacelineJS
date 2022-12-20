@@ -9,6 +9,7 @@ import {Rider} from './classes/player.js';
 import {NPC} from './classes/NPC.js';
 import * as defaults from "./settings.js"
 import { Road } from './classes/road.js';
+import * as funcs from "./classes/functions.js"
 
 
 
@@ -27,7 +28,7 @@ let pwrPressTime;
 function keyDownHandler(e) {
   pwrPressTime = new Date().getTime();
   if (e.key === "Right" || e.key === "ArrowRight" || e.key === "Left" || e.key === "ArrowLeft") {
-    player.pwr += 25;
+    player.pwr = Math.min(player.pwr + 25,1200);
   } else if (e.key === "Up" || e.key === "ArrowUp") {
     player.pwr = player.neutral_watts();
   } else if (e.key === "ArrowDown"){
@@ -45,12 +46,32 @@ function keyDownHandler(e) {
 
 function main(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // TEXT WRITING
+
+  // power figure
+  funcs.writeText(ctx,
+    "Power :",
+    10,
+    defaults.height - 10 - funcs.pwrToFontsize(player.pwr),
+    16)
+  funcs.writeText(ctx, 
+    Math.max(0,Math.round(player.pwr))  +"W", 
+    10,
+    defaults.height-10,
+    funcs.pwrToFontsize(player.pwr),
+    player.pwr
+    )
+
+
+  // GRAPHICS DRAWING
   ctx.drawImage(player.sprite, player.y,-player.x[0]/defaults.M2PX)
   markings.draw(ctx)
   for (let i = 0; i < defaults.GROUP_SIZE;i++){
-    ctx.drawImage(npcs_list[i].sprite, defaults.width/2,npcs_list[i].x[0]/defaults.M2PX)
+    ctx.drawImage(npcs_list[i].sprite, 25 + defaults.width/2,npcs_list[i].x[0]/defaults.M2PX)
   }
 
+  // GAME SIMULATION
   player.advance_pos();
   player.set_y(npcs_list)
   player.set_gap(npcs_list[npcs_list.length-1].x[0])

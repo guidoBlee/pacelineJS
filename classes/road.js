@@ -4,7 +4,7 @@ export class Road {
     constructor() {
         this.height = 850
         this.y = 0
-        this.x = Math.round(defaults.width * 0.8)
+        this.x = Math.round(defaults.width * 0.9)
         this.speed = defaults.GROUP_SPEED
         this.sprite = new Image()
         this.sprite.src = "../assets/ROAD.png";
