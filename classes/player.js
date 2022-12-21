@@ -91,20 +91,20 @@ set_y(npcs_list){
     this.y = 25 + -0.5*(1- funcs.sigmoid(25*wheel_front) -funcs.sigmoid(-25*wheel_rear))/defaults.M2PX + defaults.width/2;
 }
 
-advance_pos(){
+advance_pos(delta_t){
     let k1 = this.acceleration(this.x)
-    let k2 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k1,0.5), this.dt)));
-    let k3 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k2,0.5), this.dt)));
-    let k4 = this.acceleration(funcs.addA(this.x, funcs.multiA(k3, this.dt)));
+    let k2 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k1,0.5), delta_t)));
+    let k3 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k2,0.5), delta_t)));
+    let k4 = this.acceleration(funcs.addA(this.x, funcs.multiA(k3, delta_t)));
     let k = 0
     k = funcs.addA(funcs.addA(funcs.addA(k1, funcs.multiA(k2, 2)),funcs.multiA(k3,2)),k4);
 
-    let i = Math.round(this.t / this.dt);
+    let i = Math.round(this.t / delta_t);
     // this.traj[i, :] = this.x
     // this.thist[i] = this.t
-    this.x = funcs.addA(this.x,funcs.multiA(k, this.dt / 6));
+    this.x = funcs.addA(this.x,funcs.multiA(k, delta_t / 6));
 
-    this.t += this.dt;
+    this.t += delta_t;
     this.pwrHist.push(this.pwr);
 
 }
