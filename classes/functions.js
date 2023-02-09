@@ -1,7 +1,7 @@
 export function sigmoid(z) {
     return 1 / (1 + Math.exp(-z));
   }
-
+// elementwise addition of a and b. 
 export function addA(a,b){
     let c = Array();
     for (let i = 0; i < a.length;i++){
@@ -10,8 +10,8 @@ export function addA(a,b){
     return c;
 }
 
-// function for multiplication of an array with either another array or 
-// a scalar, b
+// function for elementwise multiplication of an array, 'a', with 
+// either another array or scalar, 'b'
 export function multiA(a,b){
     let c = Array()
     if (typeof b == 'number'){
@@ -34,6 +34,8 @@ export function writeText(context, content,x,y,sz, colorVal) {
     context.textAlign = 'right;'
     context.fillStyle = rainbow(colorVal)
     context.fillText(content, x, y);
+    y -= sz
+    return y
   }
   export function whiteText(context, content,x,y,sz) {
     context.font = "italic bold " + sz + "px Tahoma";

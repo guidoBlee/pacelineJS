@@ -1,9 +1,10 @@
 export class ImageClass{
-    constructor(){
-        this.title = new Image()
-        this.title.src = "../assets/title.png";
-        this.title.alt = 'alt';
+    constructor(loc){
+        this.sprite = new Image()
+        this.sprite.src = loc;
+        this.sprite.alt = 'alt';
 
+        
     }
 
 

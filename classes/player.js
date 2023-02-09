@@ -19,14 +19,19 @@ constructor(x0=[-0.0, 0.0], dt) {
     this.sprite = new Image()
     this.sprite.src = "../assets/player.png";
     this.sprite.alt = 'alt';
+    this.selfcomplete = false;
              }
 
 
 restart() {
-    this.pwrHist = []
-    this.x = [this.x0_game[0],this.x0_game[1]]
-    this.t = 0
-    this.pwr = 0
+    this.pwrHist = [];
+    this.x = [this.x0_game[0],this.x0_game[1]];
+    this.t = 0;
+    this.pwr = 0;
+    this.selfcomplete = false;
+    this.x = [0,0];
+    this.pwr = this.neutral_watts();
+    this.pwrHist = [];
 }
 acceleration(state){
     let pos_terms = this.pwr / (state[1] + defaults.GROUP_SPEED)
@@ -36,7 +41,6 @@ acceleration(state){
 
 set_gap(last_rider){
     this.gap = -(last_rider + this.x[0])-defaults.MIN_DRAFT_DISTANCE;
-    console.log(this.gap)
 }
 drag(){
     let rho = 1.225;
@@ -69,12 +73,12 @@ drag_watts(){
 
 
 get_normp(){
-    if (this.pwrHist.length > 0) {
+    if (this.pwrHist.length == 0) {
         return 0;
     }
-    norm_p = 0
+    let norm_p = 0
     for (const p of this.pwrHist){
-        norm_p += Math.max(0,this.pwrHist[i]) ** 4
+        norm_p += Math.max(0,p) ** 4
     }
     norm_p = norm_p/this.pwrHist.length
     return norm_p ** 0.25
@@ -85,13 +89,23 @@ set_y(npcs_list){
     for (let i = 0; i < npcs_list.length; i++){
         npc_dx[i] = npcs_list[i].x[0] + this.x[0]
     }
-    let wheel_rear = -0.2 + defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
-    console.log(wheel_rear)
-    let wheel_front = 0.15 -defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
-    this.y = 25 + -0.5*(1- funcs.sigmoid(25*wheel_front) -funcs.sigmoid(-25*wheel_rear))/defaults.M2PX + defaults.width/2;
+    let wheel_rear = defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
+    let wheel_front = defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
+    this.y = 25 + -0.5*(1- funcs.sigmoid(25*(wheel_front - 3.4)  ) -funcs.sigmoid(-35*wheel_rear))/defaults.M2PX + defaults.width/2;
 }
 
+autopilot(){
+    // control theory with gains here
+    let K = [1000,-1000];
+    let Kx = funcs.multiA(K,[this.gap-0.1,this.x[1]]);
+    let pwrInput = Kx.reduce((a, b) => a + b, 0);
+    pwrInput = Math.min(800,Math.max(pwrInput,-this.drag_watts()));
+    this.pwr = this.drag_watts() + pwrInput
+}
 advance_pos(delta_t){
+    if (this.selfcomplete){
+        this.autopilot()
+    }
     let k1 = this.acceleration(this.x)
     let k2 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k1,0.5), delta_t)));
     let k3 = this.acceleration(funcs.addA(this.x, funcs.multiA(funcs.multiA(k2,0.5), delta_t)));
@@ -103,9 +117,9 @@ advance_pos(delta_t){
     // this.traj[i, :] = this.x
     // this.thist[i] = this.t
     this.x = funcs.addA(this.x,funcs.multiA(k, delta_t / 6));
-
     this.t += delta_t;
     this.pwrHist.push(this.pwr);
 
 }
+
 }
