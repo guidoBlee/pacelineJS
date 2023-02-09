@@ -99,7 +99,7 @@ autopilot(){
     let K = [1000,-1000];
     let Kx = funcs.multiA(K,[this.gap-0.1,this.x[1]]);
     let pwrInput = Kx.reduce((a, b) => a + b, 0);
-    pwrInput = Math.min(800,Math.max(pwrInput,-this.drag_watts()));
+    pwrInput = Math.min(300,Math.max(pwrInput,-this.drag_watts()));
     this.pwr = this.drag_watts() + pwrInput
 }
 advance_pos(delta_t){

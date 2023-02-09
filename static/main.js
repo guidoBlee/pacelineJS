@@ -26,15 +26,15 @@ import { NPC } from './classes/NPC.js';
 import * as defaults from "./settings.js"
 import { Road } from './classes/road.js';
 import * as funcs from "./classes/functions.js"
-import { ImageClass } from './classes/images.js';
+import { ImageClass } from './classes/image.js';
 
 
 
 var player = new Rider([-0.0, 0.0], 1 / defaults.FRAME_RATE, 0);
 var npcs_list = Array();
 var markings = new Road();
-var title = new ImageClass("./assets/title.png");
-var nametext = new ImageClass("./assets/nameText.png");
+//var title = new ImageClass("../static/assets/title.png");
+var nametext = new ImageClass("../static/assets/nameText.png");
 
 for (let i = 0; i < defaults.GROUP_SIZE; i++) {
   var npc = new NPC(i * 1.8 + 2, 0);
@@ -51,6 +51,7 @@ let keyunpressed = true
 let conditions = false
 let playtimeComplete = false
 let multiplier = 1;
+
 function keyDownHandler(e) {
   keyunpressed = false
   if (!gameStart && ! playtimeComplete) {
@@ -88,6 +89,8 @@ function main() {
   if (! playtimeComplete){
     timestep = 1000 / defaults.FRAME_RATE;
   } else{
+    multiplier = Math.min(multiplier*1.001,20)
+    console.log(multiplier)
     timestep = multiplier * 1000 / defaults.FRAME_RATE;
     player.selfcomplete = true
   }
@@ -192,8 +195,6 @@ function main() {
   conditions = (0.05 < player.gap && player.gap < 0.3 && Math.abs(player.x[1]) < 0.5);
   if (conditions && successTime >= 3 && ! playtimeComplete){
     playtimeComplete = true
-    multiplier = gameTime/5; 
-    console.log(multiplier)
 
   }
   else if (conditions){
@@ -215,17 +216,17 @@ function main() {
 // function that runs on startup
 function starter() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(title.sprite, 12, 35);
+//  ctx.drawImage(title.sprite, 12, 35);
   ctx.drawImage(nametext.sprite, 50, defaults.height - 24)
   ctx.drawImage(player.sprite, player.y, -player.x[0] / defaults.M2PX)
-  setTimeout( function() { 
-    funcs.writeText(ctx,
-      Math.round(player.get_normp()) + 'W',
-      5,
-      2 * fontsize + lineheight,
-      fontsize,
-      )
-  }, 1000);
+//  setTimeout( function() {
+//    funcs.writeText(ctx,
+//      Math.round(player.get_normp()) + 'W',
+//      5,
+//      2 * fontsize + lineheight,
+//      fontsize,
+//      )
+//  }, 1000);
 
   markings.draw(ctx)
   for (let i = 0; i < defaults.GROUP_SIZE; i++) {
