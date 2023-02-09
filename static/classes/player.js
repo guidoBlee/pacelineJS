@@ -17,7 +17,7 @@ constructor(x0=[-0.0, 0.0], dt) {
     this.gap = -1;
     this.y = 0;
     this.sprite = new Image()
-    this.sprite.src = "./static/assets/player.png";
+    this.sprite.src = "./static/assets/PLAYER.png";
     this.sprite.alt = 'alt';
     this.selfcomplete = false;
              }
