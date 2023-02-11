@@ -4,7 +4,7 @@ export const ROAD_SPACING = 10 //
 export const M2PX = 1 / 62.5  // 62.5 PIXELS === 1 METRE
 export const MIN_DRAFT_DISTANCE = 1.65;
 export const FRAME_RATE = 60;
-export const GAME_TIME = 90;
+export const GAME_TIME = 10;
 export const width = 320
 export const height = 720
 export const speed = [2, 2]

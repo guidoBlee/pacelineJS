@@ -4,7 +4,10 @@ var PIXEL_RATIO = window.devicePixelRatio;
 // var canvas = createHiDPICanvas(defaults.width, defaults.height);
 var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
-
+var name_input = new CanvasInput({
+  canvas: document.getElementById('myCanvas'),
+  maxlength : 10
+});
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
 document.addEventListener("touchmove", touchMoveHandler, false);
@@ -27,18 +30,18 @@ const windowPercentage = 1.0;
 // initialized to the native resolution
 let cHeight = nHeight;
 let cWidth = nWidth;
+
 window.addEventListener('load', () => {
   // initialize native height/width
   ctx.canvas.width = cWidth;
   ctx.canvas.height = cHeight;
   resize();
-  render();
 })
 
 window.addEventListener('resize', () => {
   resize();
-  render();
 })
+
 
 function resize() {
   cWidth = window.innerWidth;
@@ -98,7 +101,7 @@ let timestep;
 let keyunpressed = true
 let conditions = false
 let playtimeComplete = false
-let multiplier = 1;
+let multiplier = 3;
 let lastTouch = [0,0,0]
 
 
@@ -108,7 +111,6 @@ function touchMoveHandler(e){
     clearInterval(gameStarter)
     renderer = setInterval(main, Math.round(1000 / defaults.FRAME_RATE))
     pwrPressTime = new Date().getTime();
-
   }
   // calculates speed of finger and makes power from it
   let speed = 0;
@@ -153,6 +155,17 @@ function keyDownHandler(e) {
       clearInterval(renderer)
       renderer = setInterval(main, Math.round(1000 / defaults.FRAME_RATE))
     }
+    else if (e.key ==="Enter"){ //&&  gameTime==0){
+      let usr_name = name_input.value()
+      var lb_data = $.ajax({
+        method: 'POST',
+        url: '/atl',
+        data: JSON.stringify({'usr_name': usr_name,
+                               'np': Math.round(player.get_normp())}),
+        contentType: 'application/json',
+        success: function(res){console.log(res);}
+      })
+    }
   }
 }
 
@@ -163,7 +176,8 @@ function main() {
   if (! playtimeComplete){
     timestep = 1000 / defaults.FRAME_RATE;
   } else{
-    multiplier = Math.min(15,multiplier * 1.02)
+    multiplier = Math.min(35,multiplier * 1.02)
+    console.log(multiplier)
     timestep = multiplier * 1000 / defaults.FRAME_RATE;
     player.selfcomplete = true
   }
@@ -173,18 +187,19 @@ function main() {
   let lineheight = window.innerHeight - 104
 
   // power figure
-  funcs.writeText(ctx,
-    "Power :",
-    10,
-    defaults.height - 10 - funcs.pwrToFontsize(player.pwr),
-    16)
-  funcs.writeText(ctx,
+
+  lineheight = funcs.writeText(ctx,
     Math.max(0, Math.round(player.pwr)) + "W",
     10,
-    defaults.height - 10,
+    defaults.height - funcs.pwrToFontsize(player.pwr),
     funcs.pwrToFontsize(player.pwr),
     player.pwr
   )
+    lineheight = funcs.writeText(ctx,
+    "Power :",
+    10,
+    lineheight,
+    16)
   // np figure
 
   lineheight = funcs.writeText(ctx,
@@ -266,6 +281,7 @@ function main() {
 
   // check for correct position for success
   conditions = (0.05 < player.gap && player.gap < 0.3 && Math.abs(player.x[1]) < 0.5);
+  conditions = (-100 < player.gap && player.gap < 0.3 && Math.abs(player.x[1]) < 0.5);
   
   if (conditions && successTime >= 3 && ! playtimeComplete){
     playtimeComplete = true
@@ -279,7 +295,7 @@ function main() {
 
   gameTime -= timestep / 1000;
   if (gameTime < 0){
-    gameTime == 0
+    gameTime = 0
     clearInterval(renderer)
     endScreen()
     console.log('Complete!')
@@ -302,6 +318,9 @@ function starter() {
 function endScreen(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   let fontsize = 28 +  2 * Math.sin(new Date()/10)
+  name_input.renderCanvas()
+  name_input.focus()
+
   // end message plot
   let lineheight = 100
   funcs.writeText(ctx,
@@ -336,8 +355,23 @@ function endScreen(){
         )
     }, 2000);
 
+
+
     
 
+}
+
+
+function leaderboard(){
+  
+  for (let i = 0; i < scores.length; i++){
+    funcs.writeText(ctx,
+      'GAME OVER',
+      5,
+      lineheight,
+      fontsize,
+      )
+  }
 }
 
 let renderer;
