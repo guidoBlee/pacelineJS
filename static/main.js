@@ -6,7 +6,10 @@ var canvas = document.getElementById("myCanvas");
 var ctx = canvas.getContext("2d");
 var name_input = new CanvasInput({
   canvas: document.getElementById('myCanvas'),
-  maxlength : 10
+  maxlength : 10,
+  x: defaults.width/2 - 75,
+  y: defaults.height - 245,
+  width: 150
 });
 document.addEventListener("keydown", keyDownHandler, false);
 document.addEventListener("keyup", keyUpHandler, false);
@@ -157,14 +160,17 @@ function keyDownHandler(e) {
     }
     else if (e.key ==="Enter"){ //&&  gameTime==0){
       let usr_name = name_input.value()
-      var lb_data = $.ajax({
-        method: 'POST',
-        url: '/atl',
-        data: JSON.stringify({'usr_name': usr_name,
-                               'np': Math.round(player.get_normp())}),
-        contentType: 'application/json',
-        success: function(res){console.log(res);}
-      })
+      if (conditions){
+        var lb_data = $.ajax({
+          method: 'POST',
+          url: '/atl',
+          data: JSON.stringify({'usr_name': usr_name,
+                                 'np': Math.round(player.get_normp())}),
+          contentType: 'application/json',
+          success: function(res){return res;}
+        })
+        console.log(lb_data)
+      }
     }
   }
 }
@@ -172,6 +178,33 @@ function keyDownHandler(e) {
 function keyUpHandler(e){
   keyunpressed = true;
 }
+
+
+var scores = await fetch('/frl')
+  .then(res=>res.json())
+  .then(score=>{return score;})
+
+function leaderboard(scoreboard){
+  let lineheight = 24;
+  let y_pos = lineheight * 0 + 150;
+  funcs.writeText(ctx,
+    'LEADERBOARD',
+    5,
+    y_pos,
+    lineheight,
+    )
+  for (let i = 0; i < scoreboard.length; i++){
+    y_pos = y_pos + lineheight;
+    funcs.writeText(ctx,
+      i+1 + ' ' + scoreboard[i][0] + ' ' +scoreboard[i][1] + ' W',
+      5,
+      y_pos,
+      lineheight,
+      )
+  }
+}
+
+
 function main() {
   if (! playtimeComplete){
     timestep = 1000 / defaults.FRAME_RATE;
@@ -261,7 +294,7 @@ function main() {
   ctx.drawImage(player.sprite, player.y, -player.x[0] / defaults.M2PX)
   markings.draw(ctx)
   for (let i = 0; i < defaults.GROUP_SIZE; i++) {
-    ctx.drawImage(npcs_list[i].sprite, 25 + defaults.width / 2, npcs_list[i].x[0] / defaults.M2PX)
+    ctx.drawImage(npcs_list[i].sprite, 45 + defaults.width / 2, npcs_list[i].x[0] / defaults.M2PX)
   }
 
   // GAME SIMULATION
@@ -281,7 +314,6 @@ function main() {
 
   // check for correct position for success
   conditions = (0.05 < player.gap && player.gap < 0.3 && Math.abs(player.x[1]) < 0.5);
-  conditions = (-100 < player.gap && player.gap < 0.3 && Math.abs(player.x[1]) < 0.5);
   
   if (conditions && successTime >= 3 && ! playtimeComplete){
     playtimeComplete = true
@@ -306,30 +338,47 @@ function main() {
 // function that runs on startup
 function starter() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+  leaderboard(scores)
 //  ctx.drawImage(title.sprite, 12, 35);
   ctx.drawImage(nametext.sprite, 50, defaults.height - 24)
   ctx.drawImage(player.sprite, player.y, -player.x[0] / defaults.M2PX)
   markings.draw(ctx)
   for (let i = 0; i < defaults.GROUP_SIZE; i++) {
-    ctx.drawImage(npcs_list[i].sprite, 25 + defaults.width / 2, npcs_list[i].x[0] / defaults.M2PX)
+    ctx.drawImage(npcs_list[i].sprite, 45 + defaults.width / 2, npcs_list[i].x[0] / defaults.M2PX)
   }
 }
 
 function endScreen(){
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  let fontsize = 28 +  2 * Math.sin(new Date()/10)
-  name_input.renderCanvas()
-  name_input.focus()
+  let fontsize = 28
+
 
   // end message plot
-  let lineheight = 100
+  let lineheight = 250
   funcs.writeText(ctx,
     'GAME OVER',
     5,
-    lineheight,
+    lineheight - fontsize,
     fontsize,
     )
 
+    if (conditions){
+      funcs.writeText(ctx,
+        'NICE WORK',
+        5,
+        lineheight,
+        fontsize,
+        )
+          name_input.renderCanvas()
+          name_input.focus()
+    } else {
+      funcs.writeText(ctx,
+        'TRY HARDER',
+        5,
+        lineheight,
+        fontsize,
+        )
+    }
     setTimeout( function() { 
       funcs.writeText(ctx,
         'YOU NORMALISED :',
@@ -350,35 +399,34 @@ function endScreen(){
       funcs.writeText(ctx,
         "Press R to play again",
         5,
+        6 * fontsize + lineheight,
+        fontsize,
+        )
+    }, 2000);
+    setTimeout( function() { 
+      funcs.writeText(ctx,
+        "Enter name",
+        5,
+        7 * fontsize + lineheight,
+        fontsize,
+        )
+    }, 2000);
+    setTimeout( function() { 
+      funcs.writeText(ctx,
+        " for leaderboard:",
+        defaults.width/6,
         8 * fontsize + lineheight,
         fontsize,
         )
     }, 2000);
 
-
-
     
 
-}
-
-
-function leaderboard(){
-  
-  for (let i = 0; i < scores.length; i++){
-    funcs.writeText(ctx,
-      'GAME OVER',
-      5,
-      lineheight,
-      fontsize,
-      )
-  }
 }
 
 let renderer;
 let gameStarter;
 let gameEnder;
 gameStarter = setInterval(starter, Math.round(1000 / defaults.FRAME_RATE))
-
-
 
 

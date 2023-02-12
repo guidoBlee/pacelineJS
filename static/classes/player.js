@@ -91,7 +91,7 @@ set_y(npcs_list){
     }
     let wheel_rear = defaults.MIN_DRAFT_DISTANCE +  Math.max(...npc_dx);
     let wheel_front = defaults.MIN_DRAFT_DISTANCE + Math.min(...npc_dx);
-    this.y = 25 + -0.5*(1- funcs.sigmoid(25*(wheel_front - 3.4)  ) -funcs.sigmoid(-35*wheel_rear))/defaults.M2PX + defaults.width/2;
+    this.y = 45 + -0.5*(1- funcs.sigmoid(25*(wheel_front - 3.4)  ) -funcs.sigmoid(-35*wheel_rear))/defaults.M2PX + defaults.width/2;
 }
 
 autopilot(){

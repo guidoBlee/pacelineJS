@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, jsonify, make_response
 import json
 import pickle
 import socket
@@ -32,9 +32,14 @@ def atl():
         scores.sort(key=lambda a: a[1])
         with open(b"leaderboard.obj","wb") as f:              
             pickle.dump(scores,f)
-    print(scores)
-    return scores
+    return jsonify(data=scores)
 
+@app.route("/frl")
+def frl():
+    with open(b"leaderboard.obj","rb") as f:
+            scores = pickle.load(f)
+    print(scores)
+    return jsonify(scores)
 
 if __name__ == "__main__":
     app.run(debug=True)
